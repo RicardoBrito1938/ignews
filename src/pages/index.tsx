@@ -27,7 +27,7 @@ export default function Home({ product } : HomeProps) {
           <span>for {product.amount} month</span>
         </p>
 
-        <SubscribeButton />
+        <SubscribeButton priceId={product.priceId}/>
       </section>
 
         <img src="/images/avatar.svg" alt="Girl coding"/>
@@ -37,13 +37,14 @@ export default function Home({ product } : HomeProps) {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  const price = await stripe.prices.retrieve('price_1IgHh4BsKc0DE5UWg6Tk7LZI', {
-    expand: ['product']
-  })
+  const price = await stripe.prices.retrieve('price_1IgHh4BsKc0DE5UWg6Tk7LZI')
 
   const product = {
     priceId: price.id,
-    amount: (price.unit_amount / 100),
+    amount: new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(price.unit_amount /100),
   }
 
   return {
